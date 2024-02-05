@@ -18,7 +18,7 @@ img_path = r"C:\Users\Balaji\Music\PhonePe_App_Logo.jpg"
 img = Image.open(img_path)
 st.image(img)
 st.write("""
-         Note: Blink-Time is an interactive web application that allows users to get some insights about the PhonePe Data.
+         Note: Blink-Time Is An Interactive, User-Friendly Web Application That Allows Users To Get Some Indepth Insights About The PhonePe Data By Doing The Data Extraction From PhonePe Pulse GitHub Repository,Transforming The Data By Doing Data Cleansing,Inserting the Transformed Data in SQL,Retriving the Data from SQL DB Using Python Code And Finally Presenting Them In Streamlit App With More Amazing Data Visuals Using Plotly. 
          """)
 
 # Login and Logout Section
