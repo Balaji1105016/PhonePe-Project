@@ -20,6 +20,7 @@ st.image(img)
 st.write("""
          Note: Blink-Time is an interactive web application that allows users to get some insights about the PhonePe Data.
          """)
+
 # Login and Logout Section
 if 'login_status' not in st.session_state:
     st.session_state.login_status = False
@@ -49,7 +50,7 @@ if st.session_state.login_status:
                     styles={"nav-link": {"font-size": "20px", "text-align": "left", "margin": "-1px", "--hover-color": "#6F36AD"},
                             "nav-link-selected": {"background-color": "#6F36AD"}})
     
-        
+    #Home Section:    
     if menu_sel=="Home":
         st.subheader("!!!....Phonepe Pulse Data Visualization And Exploration....!!!")
         st.subheader("""
@@ -62,6 +63,7 @@ if st.session_state.login_status:
                         6)Cashback and Rewards: PhonePe often runs cashback and reward programs, incentivizing users to make transactions through their platform.\n
             """)
 
+    #Transaction Section:
     if menu_sel=="Transactions":
         with st.sidebar:
             trans_options = option_menu("Transaction",["State_Wise","District_Wise","Pincode_Wise","Year_Wise","Highiest_Trans_Amt","Highiest_Trans_Count"],
@@ -286,7 +288,8 @@ if st.session_state.login_status:
                     6) Demographics: The demographic composition of Karnataka, including factors like age groups and income levels, may influence the preference for digital payment methods.\n
                     
                     """)
-                
+    
+    # Top Brands Section:            
     if menu_sel == "Top Brands":
         with st.sidebar:
             Brands_options = option_menu("Brands",["Brands_Wise","Top Brands Insights"],
@@ -369,7 +372,8 @@ if st.session_state.login_status:
                     5) Pre-installed Apps: Some smartphone brands come with pre-installed apps, including digital payment apps. If PhonePe is pre-installed on Xiaomi phones or promoted through their ecosystem, it may influence user behavior
                     
                     """)
-
+    
+    #Registered Users Section:
     if menu_sel == "Registered Users":
             st.subheader("Top 10 PhonePe Registered Users Count - District Wise")
             q12 = f"select State,District_Name,year,Quarter,sum(Registered_Users) as Total_Registered_Users from mp_u group by State,District_Name,Year,Quarter order by Total_Registered_Users desc limit 10"
@@ -394,7 +398,8 @@ if st.session_state.login_status:
                     4) Network Effect: If a significant number of people in Muzaffarabad are already using PhonePe, it can create a network effect, encouraging more individuals to join.\n
                     5) Access to Smartphones and Internet: The availability and accessibility of smartphones and the internet play a crucial role in the adoption of digital payment services.
                     """)
-
+    
+    #Access Frequency Section:
     if menu_sel == "Access Frequency":
         st.subheader("Application Accessing Frequency")
         q13 = f"select District_Name,Year,sum(App_opens) as Application_Accessing_Frequency from mp_u group by District_Name,Year order by Application_Accessing_Frequency desc Limit 100"
@@ -424,6 +429,8 @@ if st.session_state.login_status:
                 7) Word of Mouth: Positive experiences and recommendations from friends, family, or colleagues can significantly influence the adoption of mobile payment apps in a community.\n
                 
                 """)
+    
+    #Resources Section:
     if menu_sel == "Resources":
         st.header("Available Resources")
         q14 = f"Select distinct(Year) from ag_t"
@@ -451,7 +458,8 @@ if st.session_state.login_status:
         result_17 = cur.fetchall()
         st.subheader("Quarter Information")
         pprint(st.dataframe(pd.DataFrame(result_17,columns = ["Quarter"])))
-        
+    
+    # About Section:    
     if menu_sel == "About":
         img_path = r"C:\Users\Balaji\Music\Personal_Pic\Balaji_pic.jpeg"
         img = Image.open(img_path)
@@ -466,6 +474,7 @@ if st.session_state.login_status:
         st.markdown("Linkedin URL: https://www.linkedin.com/in/balaji-balakrishnan-34471b167/")
         st.markdown("GitHub URL: https://github.com/Balaji1105016/PhonePe-Project.git")
     
+    #Links Section:
     if menu_sel == "Links": 
         st.header("Useful Links")
         st.subheader("PhonePe GitHub Repo Source Link")    
@@ -476,7 +485,8 @@ if st.session_state.login_status:
         st.markdown("https://plotly.com/")
         st.subheader("GitHub Cloning")
         st.markdown("https://stackoverflow.com/questions/2472552/python-way-to-clone-a-git-repository")
-        
+    
+    #Process Section:    
     if menu_sel == "Process":
         st.header("Application Process Overview")
         st.write("""
@@ -511,6 +521,8 @@ if st.session_state.login_status:
                         transform, and analyze data, and to create a user-friendly dashboard for visualizing
                         the insights obtained from the data.
                      """)
+    
+    #Features Section:
     if menu_sel == "Features":
         st.header("Application Features")
         st.write("""
