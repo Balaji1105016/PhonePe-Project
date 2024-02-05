@@ -42,29 +42,24 @@ if st.session_state.login_status:
             st.session_state.login_status = False
             st.experimental_rerun()
 
-# Main Application Page:
-    st.subheader("!!!....Phonepe Pulse Data Visualization And Exploration....!!!")     
+# Main Application Page:     
     with st.sidebar:
-        menu_sel = option_menu("Menu", ["Home","Transactions","Top Brands","Registered Users","Access Frequency","Resources","About"], 
-                    icons=["house","graph-up-arrow","bar-chart-line", "exclamation-circle","gear","play","list-task"],
-                    menu_icon= "menu-button-wide",
-                    default_index=0,
+        menu_sel = option_menu("Menu", ["Home","Transactions","Top Brands","Registered Users","Access Frequency","Resources","Links","Process","Features","About"], 
+                    icons=["house","graph-up-arrow","bar-chart-line", "exclamation-circle","gear","play","cloud-upload","list-task","list-task","list-task"],
                     styles={"nav-link": {"font-size": "20px", "text-align": "left", "margin": "-1px", "--hover-color": "#6F36AD"},
                             "nav-link-selected": {"background-color": "#6F36AD"}})
+    
         
     if menu_sel=="Home":
+        st.subheader("!!!....Phonepe Pulse Data Visualization And Exploration....!!!")
         st.subheader("""
-            
-            PhonePe Importance:\n
-            1)Unified Platform: PhonePe provides a unified platform for various financial transactions, including mobile recharges, bill payments, money transfers, and online shopping.\n
-            2)UPI Integration: PhonePe heavily utilizes Unified Payments Interface (UPI), allowing users to make seamless and instant bank-to-bank transfers.\n
-            3)Wide Acceptance: PhonePe is widely accepted across numerous online and offline merchants, making it convenient for users to make payments at various establishments.\n
-            4)In-app Services: Beyond payments, PhonePe offers in-app services such as mutual funds investments, insurance payments, and gold purchases, providing users with a comprehensive financial platform.\n
-            5)User-Friendly Interface: The app is known for its user-friendly interface, making it easy for both tech-savvy and non-tech-savvy users to navigate and conduct transactions.\n
-            6)Cashback and Rewards: PhonePe often runs cashback and reward programs, incentivizing users to make transactions through their platform.\n
-            7)Security Measures: The app employs security features like UPI PIN, encryption, and two-factor authentication to ensure the safety of user transactions and data.\n
-            8)Integration with Apps and Services: PhonePe is integrated with various apps and services, allowing users to make payments directly from within other applications.\n
-            9)Quick and Instant Transactions: The use of UPI enables quick and instant fund transfers, enhancing the overall efficiency of financial transactions.
+                        PhonePe Importance:\n
+                        1)Unified Platform: PhonePe provides a unified platform for various financial transactions, including mobile recharges, bill payments, money transfers, and online shopping.\n
+                        2)UPI Integration: PhonePe heavily utilizes Unified Payments Interface (UPI), allowing users to make seamless and instant bank-to-bank transfers.\n
+                        3)Wide Acceptance: PhonePe is widely accepted across numerous online and offline merchants, making it convenient for users to make payments at various establishments.\n
+                        4)In-app Services: Beyond payments, PhonePe offers in-app services such as mutual funds investments, insurance payments, and gold purchases, providing users with a comprehensive financial platform.\n
+                        5)User-Friendly Interface: The app is known for its user-friendly interface, making it easy for both tech-savvy and non-tech-savvy users to navigate and conduct transactions.\n
+                        6)Cashback and Rewards: PhonePe often runs cashback and reward programs, incentivizing users to make transactions through their platform.\n
             """)
 
     if menu_sel=="Transactions":
@@ -81,10 +76,10 @@ if st.session_state.login_status:
             Ag_t_button = st.button("Submit")
             
             # Fetching the initial map without highlighting any specific state
-            q0 = "SELECT State, sum(Transaction_Count) as Total_Transaction_Count, sum(Transaction_Amount) as Total_Transaction_Amount FROM ag_t GROUP BY State"
+            q0 = "SELECT State, sum(Transaction_Count) as Total_Transaction_Count, sum(Transaction_Amount) as Total_Transaction_Amount,Avg(Transaction_Amount) as Average_Transaction_Amount FROM ag_t GROUP BY State"
             cur.execute(q0)
             initial_result = cur.fetchall()
-            initial_df = pd.DataFrame(initial_result, columns=['State', 'Total_Transaction_Count', 'Total_Transaction_Amount'])
+            initial_df = pd.DataFrame(initial_result, columns=['State', 'Total_Transaction_Count', 'Total_Transaction_Amount',"Average_Transaction_Amount"])
 
             # Create the initial map
             st.subheader("India Map")
@@ -94,18 +89,22 @@ if st.session_state.login_status:
                 locations='State',
                 featureidkey='properties.ST_NM',
                 color='Total_Transaction_Amount',
-                hover_data=['State', 'Total_Transaction_Count', 'Total_Transaction_Amount'],
+                hover_data=['State', 'Total_Transaction_Count', 'Total_Transaction_Amount','Average_Transaction_Amount'],
                 color_continuous_scale='reds')
 
             fig.update_geos(fitbounds="locations", visible=False)
             st.plotly_chart(fig)
             
-            # Geo-Pie Chart:   
+            # Geo-Pie Chart:
+               
             if Ag_t_button:
-                q1 = f"select State, Year, Quarter, Transaction_Type, sum(Transaction_Count) as Total_Transaction_Count, sum(Transaction_Amount) as Total_Transaction_Amount FROM ag_t WHERE State='{state}' AND Year='{year}' AND Quarter='{quarter}' GROUP BY State, Year, Quarter, Transaction_Type"
+                st.success("""
+                         Note: The user inputs like State,Year and Quarter will be applicable for the Geo-pie chart alone
+                         """)
+                q1 = f"select State, Year, Quarter, Transaction_Type, sum(Transaction_Count) as Total_Transaction_Count, sum(Transaction_Amount) as Total_Transaction_Amount,Avg(Transaction_Amount) as Average_Transaction_Amount FROM ag_t WHERE State='{state}' AND Year='{year}' AND Quarter='{quarter}' GROUP BY State, Year, Quarter, Transaction_Type"
                 cur.execute(q1)
                 result = cur.fetchall()
-                df = pd.DataFrame(result, columns=['State', 'Year', 'Quarter', 'Transaction_Type', 'Total_Transaction_Count', 'Total_Transaction_Amount'])
+                df = pd.DataFrame(result, columns=['State', 'Year', 'Quarter', 'Transaction_Type', 'Total_Transaction_Count', 'Total_Transaction_Amount',"Average_Transaction_Amount"])
 
                 if not df.empty:
                     fig_0 = px.choropleth(
@@ -114,7 +113,7 @@ if st.session_state.login_status:
                         locations='State',
                         featureidkey='properties.ST_NM',
                         color='Total_Transaction_Amount',
-                        hover_data=['Transaction_Type', 'Total_Transaction_Count', 'Total_Transaction_Amount'],
+                        hover_data=['Transaction_Type', 'Total_Transaction_Count', 'Total_Transaction_Amount',"Average_Transaction_Amount"],
                         color_continuous_scale='reds',
                         title = "Geo-Pie Chart")
                     
@@ -290,11 +289,11 @@ if st.session_state.login_status:
                 
     if menu_sel == "Top Brands":
         with st.sidebar:
-            Brands_options = option_menu("Brands",["Mobile_Brands_Wise","Top Brands Insights"],
+            Brands_options = option_menu("Brands",["Brands_Wise","Top Brands Insights"],
                             styles={"nav-link": {"font-size": "20px", "text-align": "left", "margin": "-2px", "--hover-color": "FF7F50"},
                                     "nav-link-selected": {"background-color": "#6F36AD"}})
-        if Brands_options == "Mobile_Brands_Wise":
-            st.subheader("Top Mobile Brand Contribution - State-wise")
+        if Brands_options == "Brands_Wise":
+            st.subheader("Top Brand Contribution - State-wise")
             
             # Modify your SQL query to use DENSE_RANK()
             q9 = f"""Select  State,Brand,Brand_Rank, Total_Usage_Count, Total_Usage_In_Percentage
@@ -320,7 +319,7 @@ if st.session_state.login_status:
                     color='State',
                     hover_data=['State', 'Brand','Brand_Rank', 'Total_Usage_Count', 'Total_Usage_In_Percentage'],
                     color_continuous_scale='reds',
-                    title="Top Mobile Brand Contribution - State-wise"
+                    title="Top Brand Contribution - State-wise"
                 )
                 fig.update_geos(fitbounds="locations", visible=False)
             st.plotly_chart(fig)
@@ -466,3 +465,57 @@ if st.session_state.login_status:
         st.write("Tech Skills: SQL,PL-SQL,Oracle,Python,MongoDB,AWS,Tableau,Streamlit,ServiceNow")
         st.markdown("Linkedin URL: https://www.linkedin.com/in/balaji-balakrishnan-34471b167/")
         st.markdown("GitHub URL: https://github.com/Balaji1105016/PhonePe-Project.git")
+    
+    if menu_sel == "Links": 
+        st.header("Useful Links")
+        st.subheader("PhonePe GitHub Repo Source Link")    
+        st.markdown("https://github.com/PhonePe/pulse.git")
+        st.subheader("Streamlit")
+        st.markdown("https://www.youtube.com/@streamlitofficial")
+        st.subheader("Plotly")
+        st.markdown("https://plotly.com/")
+        st.subheader("GitHub Cloning")
+        st.markdown("https://stackoverflow.com/questions/2472552/python-way-to-clone-a-git-repository")
+        
+    if menu_sel == "Process":
+        st.header("Application Process Overview")
+        st.write("""
+                     1. Data extraction: Cloning the Github using scripting to fetch the data from the
+                        Phonepe pulse Github repository and store it in a suitable format such as CSV
+                        or JSON.\n
+                        
+                     2. Data transformation: Using a scripting language such as Python, along with
+                        libraries such as Pandas, to manipulate and pre-process the data. This may
+                        include cleaning the data, handling missing values, and transforming the data
+                        into a format suitable for analysis and visualization.\n
+                     
+                     3. Database insertion: Using the "mysql-connector-python" library in Python to
+                        connect to a MySQL database and insert the transformed data using SQL
+                        commands.\n
+
+                     4. Dashboard creation: Using the Streamlit and Plotly libraries in Python to create
+                        an interactive and visually appealing dashboard. Plotly's built-in geo map
+                        functions can be used to display the data on a map and Streamlit can be used
+                        to create a user-friendly interface with multiple dropdown options for users to
+                        select different facts and figures to display.\n
+                     
+                     5. Data retrieval: Using the "mysql-connector-python" library to connect to the
+                        MySQL database and fetch the data into a Pandas dataframe. Use the data in
+                        the dataframe to update the dashboard dynamically.\n
+                     
+                     6. Deployment: Ensuring the solution is secure, efficient, and user-friendly. Test
+                        the solution thoroughly and deploy the dashboard publicly, making it
+                        accessible to users.\n
+                        
+                        This approach leverages the power of Python and its numerous libraries to extract,
+                        transform, and analyze data, and to create a user-friendly dashboard for visualizing
+                        the insights obtained from the data.
+                     """)
+    if menu_sel == "Features":
+        st.header("Application Features")
+        st.write("""
+                 1) Easy To Interact
+                 2) Get some indepth insights on PhonePe Data
+                 3) Better Data Visualization
+                 4) Easy to understand the process
+                 """)
