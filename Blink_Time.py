@@ -21,6 +21,7 @@ st.write("""
          Note: Blink-Time Is An Interactive, User-Friendly Web Application That Allows Users To Get Some Indepth Insights About The PhonePe Data By Doing The Data Extraction From PhonePe Pulse GitHub Repository,Transforming The Data By Doing Data Cleansing,Inserting the Transformed Data in SQL,Retriving the Data from SQL DB Using Python Code And Finally Presenting Them In Streamlit App With More Amazing Data Visuals Using Plotly. 
          """)
 
+
 # Login and Logout Section
 if 'login_status' not in st.session_state:
     st.session_state.login_status = False
@@ -42,6 +43,12 @@ if st.session_state.login_status:
         if 'login_status' in st.session_state:
             st.session_state.login_status = False
             st.experimental_rerun()
+            
+            
+# Guidence Section:
+    st.sidebar.write("""
+                    Note: Incase Of Any Issues With Input Data,Kindly Refer Resource Section
+                    """)
 
 # Main Application Page:     
     with st.sidebar:
@@ -72,6 +79,9 @@ if st.session_state.login_status:
             
         if trans_options == "State_Wise":
             st.header("State Wise Transaction")
+            st.success("""
+                     Note: This Module Provides The Information About State,Transaction Type,Total Transaction Count,Total Transaction Amount,Average Transaction Amount Based On State Wise Category
+                     """)
             state = st.text_input("Enter the State ")
             year = st.text_input("Enter the Year ")
             quarter = st.text_input("Enter the Quarter ")
@@ -83,7 +93,7 @@ if st.session_state.login_status:
             initial_result = cur.fetchall()
             initial_df = pd.DataFrame(initial_result, columns=['State', 'Total_Transaction_Count', 'Total_Transaction_Amount',"Average_Transaction_Amount"])
 
-            # Create the initial map
+            # initial map
             st.subheader("India Map")
             fig = px.choropleth(
                 initial_df,
@@ -124,55 +134,69 @@ if st.session_state.login_status:
                     
         if trans_options == "District_Wise":
             st.header("District Wise Transaction")
+            st.success("""
+                     Note: This Module Provides The Information About District Name,Total Transaction Count,Total Transaction Amount,Average Transaction Amount Based On District Wise Category
+                     """)
+            
             District_Name = st.text_input("Enter the District Name ")
             year = st.text_input("Enter the Year ")
             quarter = st.text_input("Enter the Quarter ")
             Mp_t_button = st.button("Submit")
 
             if Mp_t_button:
-                q2 = f"select State,District_Name,Year,Quarter,sum(Transaction_Count) as Total_Transaction_Count, sum(Transaction_Amount) as Total_Transaction_Amount FROM mp_t WHERE District_Name ='{District_Name}' AND Year='{year}' AND Quarter='{quarter}' GROUP BY State,District_Name, Year, Quarter"
+                q2 = f"select District_Name,Year,Quarter,sum(Transaction_Count) as Total_Transaction_Count, sum(Transaction_Amount) as Total_Transaction_Amount,Avg(Transaction_Amount) as Average_Transaction_Amount FROM mp_t WHERE District_Name ='{District_Name}' AND Year='{year}' AND Quarter='{quarter}' GROUP BY District_Name, Year, Quarter"
                 cur.execute(q2)
                 result_1 = cur.fetchall()
-                df_1 = pd.DataFrame(result_1, columns=["State", "District_Name", "Year", "Quarter", "Total_Transaction_Count", "Total_Transaction_Amount"])
+                df_1 = pd.DataFrame(result_1, columns=[ "District_Name", "Year", "Quarter", "Total_Transaction_Count", "Total_Transaction_Amount","Average_Transaction_Amount"])
 
                 if not df_1.empty:
                     st.subheader(f"Details For District - {District_Name}, Year - {year}, Quarter - {quarter}")
 
-                    # Create Sunburst chart
+                    # Sunburst chart
                     fig = px.sunburst(
                         df_1,
-                        path=['Total_Transaction_Amount','Total_Transaction_Count','Quarter', 'Year', 'District_Name','State'],
-                        hover_data = ['Total_Transaction_Count','Total_Transaction_Amount'])
+                        path=['Average_Transaction_Amount','Total_Transaction_Amount','Total_Transaction_Count','Quarter', 'Year', 'District_Name'],
+                        hover_data = ['Average_Transaction_Amount','Total_Transaction_Count','Total_Transaction_Amount'],
+                        title = "Sunburst Chart")
                     st.plotly_chart(fig)
         
         if trans_options == "Pincode_Wise":
             st.header("Pincode Wise Transaction")
+            st.success("""
+                     Note: This Module Provides The Information About Pincode Number,Total Transaction Count,Total Transaction Amount,Average Transaction Amount Based On Pincode Wise Category
+                     """)
+            
             Pincode_Number = st.text_input("Enter the Pincode")
             Year = st.text_input("Enter the Year")
             Quarter = st.text_input("Enter the Quarter")
             tp_t_button = st.button("Submit")
             if tp_t_button:
-                q3 = f"Select State,Year,Quarter,Pincode,sum(Transaction_Count) as Total_Transaction_Count, sum(Transaction_Amount) as Total_Transaction_Amount FROM tp_t where pincode = {Pincode_Number} and Year = {Year} and Quarter = {Quarter} group by State,Year,Quarter,Pincode"
+                q3 = f"Select Pincode,Year,Quarter,sum(Transaction_Count) as Total_Transaction_Count, sum(Transaction_Amount) as Total_Transaction_Amount,Avg(Transaction_Amount) as Average_Transaction_Amount FROM tp_t where pincode = {Pincode_Number} and Year = {Year} and Quarter = {Quarter} group by Pincode,Year,Quarter"
                 cur.execute(q3)
                 result_2 = cur.fetchall()
-                df_2 = pd.DataFrame(result_2,columns = ["State","Year","Quarter","Pincode","Total_Transaction_Count","Total_Transaction_Amount"])
+                df_2 = pd.DataFrame(result_2,columns = ["Pincode","Year","Quarter","Total_Transaction_Count","Total_Transaction_Amount","Average_Transaction_Amount"])
                 
                 if not df_2.empty:
                     st.subheader(f"Details For Pincode - {Pincode_Number}, Year - {Year}, Quarter - {Quarter}")
             
-                    # Create Sunburst chart
+                    # Sunburst chart
                     fig = px.sunburst(
                         df_2,
-                        path=["Total_Transaction_Amount","Total_Transaction_Count",'Quarter', 'Year', 'Pincode','State'],
-                        hover_data=['Total_Transaction_Count','Total_Transaction_Amount'])
+                        path=["Average_Transaction_Amount","Total_Transaction_Amount","Total_Transaction_Count",'Quarter', 'Year', 'Pincode'],
+                        hover_data=["Average_Transaction_Amount",'Total_Transaction_Count','Total_Transaction_Amount'],
+                        title = "Sunburst Chart")
                     st.plotly_chart(fig)
                     
         if trans_options == "Year_Wise":
             st.header("Year-Wise Transactions")
-            q4 = "SELECT Year, Quarter, SUM(Transaction_Amount) as Total_Transaction_Amount FROM ag_t GROUP BY Year, Quarter ORDER BY Total_Transaction_Amount LIMIT 100"
+            st.success("""
+                     Note: This Module Provides The Information About Year,Quarter,Total Transaction Amount,Average Transaction Amount Based On Year Wise Category
+                     """)
+            
+            q4 = "SELECT Year, Quarter, SUM(Transaction_Amount) as Total_Transaction_Amount,Avg(Transaction_Amount) as Average_Transaction_Amount FROM ag_t GROUP BY Year, Quarter ORDER BY Total_Transaction_Amount,Average_Transaction_Amount LIMIT 100"
             cur.execute(q4)
             result_3 = cur.fetchall()
-            df_3 = pd.DataFrame(result_3, columns=["Year", "Quarter", "Total_Transaction_Amount"])
+            df_3 = pd.DataFrame(result_3, columns=["Year", "Quarter", "Total_Transaction_Amount","Average_Transaction_Amount"])
             if not df_3.empty:
                 fig = px.line(
                     df_3,
@@ -180,6 +204,7 @@ if st.session_state.login_status:
                     y="Total_Transaction_Amount",
                     color="Year",
                     labels={"Total_Transaction_Amount": "Total Transaction Amount"},
+                    hover_data=["Quarter","Year","Total_Transaction_Amount","Average_Transaction_Amount"],
                     title="Year-Wise Trend Chart"
                 )
                 
@@ -200,10 +225,10 @@ if st.session_state.login_status:
                                 x='State',
                                 y='Total_Transaction_Amount',
                                 color='Year',
-                                color_discrete_sequence="color_palette",  # Provide the actual color palette here
+                                color_discrete_sequence="color_palette",
                                 facet_col='Year',
                                 labels={'Total_Transaction_Amount':'Total Transaction Amount'})
-                                # text = "Total_Transaction_Amount")
+                                
 
                 st.plotly_chart(fig)
             
@@ -218,10 +243,10 @@ if st.session_state.login_status:
                                 x='State',
                                 y='Total_Transaction_Amount',
                                 color='Year',
-                                color_discrete_sequence="color_palette",  # Provide the actual color palette here
+                                color_discrete_sequence="color_palette",
                                 facet_col='Year',
                                 labels={'Total_Transaction_Amount':'Total Transaction Amount'})
-                                # text = "Total_Transaction_Amount")
+                                
 
                 st.plotly_chart(fig)
             st.subheader("Reason")
@@ -251,10 +276,10 @@ if st.session_state.login_status:
                                 x='State',
                                 y='Total_Transaction_Count',
                                 color='Year',
-                                color_discrete_sequence="color_palette",  # Provide the actual color palette here
+                                color_discrete_sequence="color_palette", 
                                 facet_col='Year',
                                 labels={'Total_Transaction_Count':'Total Transaction Count'})
-                                # text = "Total_Transaction_Amount")
+                                
 
                 st.plotly_chart(fig)
             
@@ -269,10 +294,10 @@ if st.session_state.login_status:
                                 x='State',
                                 y='Total_Transaction_Count',
                                 color='Year',
-                                color_discrete_sequence="color_palette",  # Provide the actual color palette here
+                                color_discrete_sequence="color_palette", 
                                 facet_col='Year',
                                 labels={'Total_Transaction_Count':'Total Transaction Count'})
-                                # text = "Total_Transaction_Amount")
+                               
 
                 st.plotly_chart(fig)
                 st.subheader("Reason")
@@ -297,8 +322,9 @@ if st.session_state.login_status:
                                     "nav-link-selected": {"background-color": "#6F36AD"}})
         if Brands_options == "Brands_Wise":
             st.subheader("Top Brand Contribution - State-wise")
-            
-            # Modify your SQL query to use DENSE_RANK()
+            st.success("""
+                     Note: This Module Provides The Information About State,Brand,Brand_Rank,Total Usage Count,Total Usage In Percentage Based On State Wise Category
+                     """)
             q9 = f"""Select  State,Brand,Brand_Rank, Total_Usage_Count, Total_Usage_In_Percentage
                             FROM (select State,Year,Quarter,Brand,
                                     SUM(Count) AS Total_Usage_Count,
